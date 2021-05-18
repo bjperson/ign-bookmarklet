@@ -1,0 +1,37 @@
+<html>
+<title>IGN Bookmarklet</title>
+<style>
+  body {
+      font-family: Arial;
+      font-style: italic;
+      margin: auto;
+      padding-top: 3%;
+      text-align: center;
+  }
+  #bookmarklet {
+    font-size: 10em;
+  }
+</style>
+<body>
+  <h1>Installation</h1>
+
+  <p>Il suffit de glisser/déposer le "#" ci-dessous dans vos marques pages  :</p>
+
+  <p style="text-align:center"><a id="bookmarklet" href="">#</a></p>
+
+  <p>Ceci devrait créer un nouveau marque page intitulé "IGN Bookmarklet".</p>
+
+  <h1>Utilisation</h1>
+  
+  <p>Aller sur la page : <a href="https://geoservices.ign.fr/documentation/diffusion/telechargement-donnees-libres.html">Géoservices IGN</a></p>
+
+  <p>Cliquer sur le marque page</p>
+
+</body>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var bookmarkhref = "javascript:(function(){%20var%20script=document.createElement('script');script.type='text/javascript';script.src=window.location.protocol+'//"+window.location.hostname+"/ign-bookmarklet/ign-bookmarklet.js';document.body.appendChild(script);})()";
+  document.getElementById("bookmarklet").href = bookmarkhref;
+});
+</script>
+</html>
