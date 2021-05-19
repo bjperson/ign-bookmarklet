@@ -1,6 +1,6 @@
 # ign-bookmarklet
 
-Ajoute un petit moteur de recherche à la page des données libres de l'IGN.
+Ajoute un petit moteur de recherche à la page des données libres de l'IGN afin de permettre aux plus geeks d'entre nous de tirer parti de la convention de nommage des fichiers téléchargeables.
 
 Permet également de générer une liste de liens vers les fichiers recherchés.
 
