@@ -1,5 +1,6 @@
 $('.lastUpdate').after('<div><div><input type="text" id="values" placeholder="bd topo gpkg 2021" style="height:35px" title="Pour exclure un terme, préfixez le avec le signe moins. Ex: -shp" /><a href="javascript:clear()" style="padding: 7px;border: 1px solid #bababa;border-left: none;font-weight: bold;color: #949494;border-radius: 3px;">X</a> <input type="submit" value="rechercher" onclick="javascript:filterFileNames();" style="height:35px" /> <a href="javascript:filterFileNames(true);">liste de liens</a></div><div id="results"></div></div>');
 const fname = /([^\/]{1,})$/;
+const downloadable = $.merge($("a[href*='7z']"), $("a[href*='zip']"));
 $('#values').focus();
 
 function filterFileNames(asText = false) {
@@ -7,7 +8,7 @@ function filterFileNames(asText = false) {
   arr = [];
   var text = '';
   var v = $('#values').val().trim().toUpperCase().split(' ');
-  var results = $("a[href*='7z']");
+  var results = downloadable;
   for (var i in v) {
     if (v[i].startsWith('-')) {
       results = results.not("a[href*='"+v[i].substring(1)+"']")
