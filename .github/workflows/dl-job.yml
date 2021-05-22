@@ -8,7 +8,6 @@ jobs:
   dl:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: download file
         run: curl https://files.opendatarchives.fr/professionnels.ign.fr/tree.json -o ./resources/opendatarchives.json
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
