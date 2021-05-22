@@ -1,0 +1,9 @@
+name: dl-job
+on:
+  schedule:
+    - cron:  '0 17 * * *'
+jobs:
+  dl:
+    runs-on: ubuntu-latest
+    steps:
+      run: curl https://files.opendatarchives.fr/professionnels.ign.fr/tree.json -o resources
