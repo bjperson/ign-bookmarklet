@@ -6,4 +6,5 @@ jobs:
   dl:
     runs-on: ubuntu-latest
     steps:
-      run: curl https://files.opendatarchives.fr/professionnels.ign.fr/tree.json -o resources
+    - name: download file
+      run: curl https://files.opendatarchives.fr/professionnels.ign.fr/tree.json -o resources/opendatarchives.json
