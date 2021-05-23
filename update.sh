@@ -1,5 +1,5 @@
 #!/bin/bash
-curl https://files.opendatarchives.fr/professionnels.ign.fr/tree.json -o ./resources/opendatarchives2.json
+curl https://data.cquest.org/ign/tree.json -o ./resources/opendatarchives2.json
 process=false
 
 if [ -f "./resources/opendatarchives.json" ]
