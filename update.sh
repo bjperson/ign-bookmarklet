@@ -24,13 +24,11 @@ then
   extracted=$(cat ./resources/opendatarchives.json | grep name | sed 's| ||g' | sed 's|^"name.\{1,\}org||' | sort | uniq | grep "7z\|zip" | sed 's|\([^/]\{1,\}\)$| \1|' | sed 's|\([^ ]\{1,\}\) \([^"]\{1,\}\)|"\2": "\1|');
   echo "${extracted::-1}" >> ./resources/extract.js
   echo "}" >> ./resources/extract.js
+  
+  git config user.name github-actions (bot)
+  git config user.email github-actions@github.com
+  git add ./resources/opendatarchives.json
+  git add ./resources/extract.js
+  git commit -m "generated extract"
+  git push
 fi
-
-git config user.name bjperson
-git config user.email bjperson@github.com
-git add ./resources/opendatarchives.json
-git add ./resources/extract.js
-git commit -m "generated extract"
-git push
-
-
