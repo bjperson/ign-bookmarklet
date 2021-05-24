@@ -25,8 +25,8 @@ then
   echo "${extracted::-1}" >> ./resources/extract.js
   echo "}" >> ./resources/extract.js
   
-  git config user.name github-actions (bot)
-  git config user.email github-actions@github.com
+  git config user.name "github-actions (bot)"
+  git config user.email ign-bookmarklet@noreply.github.com
   git add ./resources/opendatarchives.json
   git add ./resources/extract.js
   git commit -m "generated extract"
