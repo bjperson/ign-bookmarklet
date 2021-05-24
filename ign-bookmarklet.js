@@ -13,6 +13,7 @@ const documentation = $("#docs a");
 const fname = /([^\/]{1,})$/;
 const altUrl = "https://data.cquest.org";
 const downloadable = $.merge($("a[href*='7z']"), $("a[href*='zip']"));
+var opendatarchive = {};
 
 $('#values').focus();
 
@@ -47,8 +48,8 @@ function filterFileNames(asText = false) {
       for (var i in arr.sort()) {
         if (alt) {
           var match = arr[i].match(fname);
-          if (match[1] in opendatarchives) {
-            text += altUrl+opendatarchives[match[1]]+match[1]+"\n";
+          if (match[1] in opendatarchive) {
+            text += altUrl+opendatarchive[match[1]].path+match[1]+"\n";
           }
           else {
             text += arr[i]+"\n";
@@ -64,8 +65,8 @@ function filterFileNames(asText = false) {
       for (var i in arr.sort()) {
         var match = arr[i].match(fname);
         if (alt) {
-          if (match[1] in opendatarchives) {
-            text += '<a href="'+altUrl+opendatarchives[match[1]]+match[1]+'">'+match[1]+'</a><br />'+"\n";
+          if (match[1] in opendatarchive) {
+            text += '<a href="'+altUrl+opendatarchive[match[1]].path+match[1]+'">'+match[1]+'</a><br />'+"\n";
           }
           else {
             text += '<a href="'+arr[i]+'">'+match[1]+'</a><br />'+"\n";
@@ -94,4 +95,17 @@ $("#values").keypress(function(event) {
   }
 });
 
-$.getScript("https://bjperson.github.io/ign-bookmarklet/resources/extract.js");
+$.getScript( "https://bjperson.github.io/ign-bookmarklet/resources/opendatarchives.js" )
+  .done(function() {
+    opendatarchive = {};
+    opendatarchives.sort((a, b) => {
+      if (Date.parse(a.time) > Date.parse(b.time)) return -1
+        return Date.parse(a.time) < Date.parse(b.time) ? 1 : 0
+    });
+    for (var i in opendatarchives) {
+      if (!(opendatarchives[i].name in opendatarchive)) {
+        opendatarchive[opendatarchives[i].name] = opendatarchives[i];
+      }
+    }
+    opendatarchives = {};
+  });
