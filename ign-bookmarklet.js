@@ -12,7 +12,7 @@ $('.size').css({"float": "right", "font-variant": "super", "color": "#A0A0A0"});
 
 const documentation = $("#docs a");
 const fnameRegex = /([^\/]{1,})$/;
-const altUrl = "https://data.cquest.org";
+const altUrl = "https://data.cquest.org/";
 const downloadable = $.merge($("a[href*='7z']"), $("a[href*='zip']"));
 var opendatarchive = {};
 
@@ -92,7 +92,7 @@ function filterFileNames(asText = false) {
             text += '<a href="'+arr[i]+'">'+fname+'<span class="size">'+formatBytes(opendatarchive[fnameOA].size)+'</span></a><br />'+"\n";
           }
           else {
-            text += '<a href="'+arr[i]+'">'+fname+'</a><br />'+"\n";
+            text += '<a href="'+arr[i]+'">'+fname+'<span class="size" title="taille inconnue">...</span></a><br />'+"\n";
           }
         }
       }
@@ -100,19 +100,22 @@ function filterFileNames(asText = false) {
       var results_size = '';
       
       if (size !== 0) {
-        results_size += formatBytes(size)
+        results_size += formatBytes(size, 2);
       }
       
       if (nosize !== 0) {
-        results_size += ' + '+nosize+' fichiers de taille inconnue'
+        results_size += ' + '+nosize+' fichiers de taille inconnue';
       }
+      
+      $('#results').html('<p>'+arr.length+' '+r+' :<span class="size">'+results_size+'</span></p>'+"\n");
 
       if (asText) {
-        $('#results').html('<p title="'+results_size+'">'+arr.length+' '+r+' :</p><textarea style="width:100%;height:200px;">'+text+'</textarea>');
+        $('#results').append('<textarea style="width:100%;height:200px;">'+text+'</textarea>');
       }
       else {
-        $('#results').html('<p title="'+results_size+'">'+arr.length+' '+r+' :</p>'+"\n"+text);
-  			$('.size').css({"float": "right", "font-variant": "super", "color": "#A0A0A0"});
+        $('#results').append(text);
+  			$('.size').css({"float": "right", "font-size": "0.8em", "color": "#A0A0A0"});
+  			$('#results a:hover').css({"background-color": "#dfdfdf"});
       }
     }
     else {
@@ -136,7 +139,7 @@ $("#values").keypress(function(event) {
 });
 
 // from: https://stackoverflow.com/a/18650828
-function formatBytes(bytes, decimals = 2) {
+function formatBytes(bytes, decimals = 0) {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
@@ -145,17 +148,17 @@ function formatBytes(bytes, decimals = 2) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-$.getScript( "https://bjperson.github.io/ign-bookmarklet/resources/opendatarchives.js" )
+$.getScript( "https://bjperson.github.io/ign-bookmarklet/resources/archives.js" )
   .done(function() {
     opendatarchive = {};
-    opendatarchives.sort((a, b) => {
+    archives.sort((a, b) => {
       if (Date.parse(a.time) > Date.parse(b.time)) return -1
         return Date.parse(a.time) < Date.parse(b.time) ? 1 : 0
     });
-    for (var i in opendatarchives) {
-      if (!(opendatarchives[i].name in opendatarchive)) {
-        opendatarchive[opendatarchives[i].name] = opendatarchives[i];
+    for (var i in archives) {
+      if (!(archives[i].name in opendatarchive)) {
+        opendatarchive[archives[i].name] = archives[i];
       }
     }
-    opendatarchives = {};
+    archives = {};
   });
