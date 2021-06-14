@@ -1,0 +1,11 @@
+name: ign-job
+on:
+  workflow_dispatch:
+
+jobs:
+  dl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: update feed
+        run: bash ./ign.sh
