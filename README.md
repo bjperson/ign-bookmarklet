@@ -4,10 +4,10 @@ Ajoute un petit moteur de recherche à la page des données libres de l'IGN afin
 
 Permet également de générer une liste de liens vers les fichiers recherchés et facilite l'accès à leur documentation.
 
-![screenshot](https://user-images.githubusercontent.com/1690322/119164289-8bca9880-ba5c-11eb-8dc1-a0e3c43b075c.png)
+![screeshot](https://user-images.githubusercontent.com/1690322/122058820-52334600-cdec-11eb-871b-86a6d40cdd82.png)
 
 [Instructions d'installation](https://bjperson.github.io/ign-bookmarklet/index.html)
 
-Bonus:
+Si vous souhaitez rester informé des mises à jour de ces données, ce flux en propose une synthèse journalière :
 
 [Flux RSS (format ATOM)](https://bjperson.github.io/ign-bookmarklet/resources/atom.xml)
