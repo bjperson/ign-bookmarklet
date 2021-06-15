@@ -27,28 +27,31 @@ then
   echo "archives = $json;" > ./resources/archives2.js
 fi
 
-if [ -f "./resources/archives.js" ]
+if [ -f "./resources/archives2.js" ]
 then
-  old_file=$(md5sum ./resources/archives.js | sed 's|  [^ ]\{1,\}$||');
-  new_file=$(md5sum ./resources/archives2.js | sed 's|  [^ ]\{1,\}$||');
-  if [ "$old_file" != "$new_file" ]
+  if [ -f "./resources/archives.js" ]
   then
-    #echo "md5 mismatch";
-    old_size=$(wc -c ./resources/archives.js | sed 's| [^ ]\{1,\}$||');
-    new_size=$(wc -c ./resources/archives2.js | sed 's| [^ ]\{1,\}$||');
-    half_old_size=$(($old_size / 2));
-    if [ $new_size -gt $half_old_size ]
+    old_file=$(md5sum ./resources/archives.js | sed 's|  [^ ]\{1,\}$||');
+    new_file=$(md5sum ./resources/archives2.js | sed 's|  [^ ]\{1,\}$||');
+    if [ "$old_file" != "$new_file" ]
     then
-      #echo "new file size greater than half of old file size";
-      rm ./resources/archives.js
-      mv ./resources/archives2.js ./resources/archives.js
-      file_changed=true
+      #echo "md5 mismatch";
+      old_size=$(wc -c ./resources/archives.js | sed 's| [^ ]\{1,\}$||');
+      new_size=$(wc -c ./resources/archives2.js | sed 's| [^ ]\{1,\}$||');
+      half_old_size=$(($old_size / 2));
+      if [ $new_size -gt $half_old_size ]
+      then
+        #echo "new file size greater than half of old file size";
+        rm ./resources/archives.js
+        mv ./resources/archives2.js ./resources/archives.js
+        file_changed=true
+      fi
     fi
+  else
+    #echo "First archives.js";
+    mv ./resources/archives2.js ./resources/archives.js
+    file_changed=true
   fi
-else
-  #echo "First archives.js";
-  mv ./resources/archives2.js ./resources/archives.js
-  file_changed=true
 fi
 
 if [ "$file_changed" = true ]
@@ -58,4 +61,5 @@ then
   git add ./resources/archives.js
   git commit -m "Generated new archives.js"
   git push
+  ./ign.sh
 fi
