@@ -56,6 +56,11 @@ xml = '''\
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>Open Data IGN</title>
   <link href="https://github.com/bjperson/ign-bookmarklet"/>
+  <link rel="self" href="https://bjperson.github.io/ign-bookmarklet/resources/atom.xml" />
+  <author>
+    <name>Brice Person</name>
+    <uri>https://www.ideeslibres.org</uri>
+  </author>
   <updated>{last}:00Z</updated>
   <id>https://geoservices.ign.fr/documentation/diffusion/telechargement-donnees-libres.html</id>\
 '''.format(last=last_update)
