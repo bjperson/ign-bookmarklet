@@ -7,3 +7,7 @@ Permet également de générer une liste de liens vers les fichiers recherchés 
 ![screenshot](https://user-images.githubusercontent.com/1690322/119164289-8bca9880-ba5c-11eb-8dc1-a0e3c43b075c.png)
 
 [Instructions d'installation](https://bjperson.github.io/ign-bookmarklet/index.html)
+
+Bonus:
+
+[Flux RSS (format ATOM)](https://bjperson.github.io/ign-bookmarklet/resources/atom.xml)
