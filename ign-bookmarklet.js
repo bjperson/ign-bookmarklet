@@ -9,6 +9,7 @@ for (var d in docus) {
 $('#docs').html(links);
 $('#docs a').css({"border": "1px solid #bababa", "border-radius": "4px", "font-size": "0.7em", "padding": "2px 5px", "margin": "0 5px 8px 0", "display": "inline-block"});
 $('.size').css({"float": "right", "font-variant": "super", "color": "#A0A0A0"});
+$('body').append('<span id="go-up" onclick="uiScrollTo(\'#nav-header\')" style="position: fixed; right: 5px; bottom: 5px; background-color: #fff; border: 1px solid #bababa; border-radius: 4px; width: 35px; height: 35px; text-align: center; cursor: pointer;">^ ^ ^ ^</span>');
 
 const documentation = $("#docs a");
 const fnameRegex = /([^\/]{1,})$/;
@@ -111,6 +112,7 @@ function filterFileNames(asText = false) {
 
       if (asText) {
         $('#results').append('<textarea style="width:100%;height:200px;">'+text+'</textarea>');
+        $('.size').css({"float": "right", "font-size": "0.8em", "color": "#A0A0A0"});
       }
       else {
         $('#results').append(text);
@@ -132,11 +134,11 @@ function clear() {
   $('#values').focus();
 }
 
-$("#values").keypress(function(event) {
-  if (event.keyCode === 13) {
-    filterFileNames();
-  }
-});
+function uiScrollTo(id = '#values') {
+  document.querySelector(id).scrollIntoView({
+    behavior: 'smooth'
+  });
+}
 
 // from: https://stackoverflow.com/a/18650828
 function formatBytes(bytes, decimals = 0) {
@@ -147,6 +149,12 @@ function formatBytes(bytes, decimals = 0) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
+
+$("#values").keypress(function(event) {
+  if (event.keyCode === 13) {
+    filterFileNames();
+  }
+});
 
 $.getScript( "https://bjperson.github.io/ign-bookmarklet/resources/archives.js" )
   .done(function() {
