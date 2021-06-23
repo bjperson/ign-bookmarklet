@@ -1,5 +1,5 @@
 #!/bin/bash
-file_changed=false
+file_changed=${1:-false}
 
 wget -q https://geoservices.ign.fr/documentation/diffusion/telechargement-donnees-libres.html -O ./resources/libre.html
 
