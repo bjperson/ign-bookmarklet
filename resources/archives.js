@@ -1299,6 +1299,7 @@ archives = [{"name":"BDORTHO_RVB-0M20_COG75_RGF93LAMB93_D074_2020.7z.001","time"
 {"name":"ORTHOHR_1-0_RVB-0M20_JP2-E080_LAMB93_D086_2020-01-01.7z.006","time":"2021-07-21T18:56","size":4294967296,"path":"ign/orthohr/"},
 {"name":"ORTHOHR_1-0_RVB-0M20_JP2-E080_LAMB93_D086_2020-01-01.7z.007","time":"2021-07-21T23:01","size":4294967296,"path":"ign/orthohr/"},
 {"name":"ORTHOHR_1-0_RVB-0M20_JP2-E080_LAMB93_D086_2020-01-01.7z.008","time":"2021-07-21T19:31","size":2819819335,"path":"ign/orthohr/"},
+{"name":"ORTHOHR_1-0_RVB-0M20_JP2-E080_LAMB93_D086_2020-01-01.7z.7z.001","time":"2021-07-26T05:42","size":58,"path":"ign/orthohr/"},
 {"name":"ORTHOHR_1-0_RVB-0M20_JP2-E080_LAMB93_D087_2017-01-01.7z.001","time":"2018-02-20T17:59","size":4294967296,"path":"ign/orthohr/"},
 {"name":"ORTHOHR_1-0_RVB-0M20_JP2-E080_LAMB93_D087_2017-01-01.7z.002","time":"2018-02-20T17:59","size":4294967296,"path":"ign/orthohr/"},
 {"name":"ORTHOHR_1-0_RVB-0M20_JP2-E080_LAMB93_D087_2017-01-01.7z.003","time":"2018-02-20T17:59","size":4294967296,"path":"ign/orthohr/"},
