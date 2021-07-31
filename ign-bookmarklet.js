@@ -1,48 +1,35 @@
-$('.lastUpdate').after('<div><div><input type="text" id="values" placeholder="bd topo gpkg 2021" style="height:35px" title="Pour exclure un terme, préfixez le avec le signe moins. Ex: -shp" /><a href="javascript:clear()" style="padding: 7px;border: 1px solid #bababa;border-left: none;font-weight: bold;color: #949494;border-radius: 3px;">X</a> <input type="submit" value="rechercher" onclick="javascript:filterFileNames();" style="height:35px" /> <a href="javascript:filterFileNames(true);">liste de liens</a><span style="float:right;"><a type="application/atom+xml"  target="_blank" rel="noreferrer" rel="noopener" title="Flux RSS des données libres de l\'IGN" href="https://bjperson.github.io/ign-bookmarklet/resources/atom.xml"><svg style="width:22px;margin-top:6px;" enable-background="new 0 0 455.731 455.731" version="1.1" viewBox="0 0 455.73 455.73" xmlns="http://www.w3.org/2000/svg"><rect width="455.73" height="455.73" fill="#F78422"/><g fill="#fff"><path d="m296.21 159.16c-61.763-61.763-143.94-95.778-231.4-95.778v64.348c70.268 0 136.29 27.321 185.9 76.931 49.609 49.61 76.931 115.63 76.931 185.9h64.348c-1e-3 -87.456-34.016-169.64-95.779-231.4z"/><path d="m64.143 172.27v64.348c84.881 0 153.94 69.056 153.94 153.94h64.348c0-120.36-97.922-218.29-218.29-218.29z"/><circle cx="109.83" cy="346.26" r="46.088"/></g></svg></a></span><p><input type="checkbox" id="alt" name="alt" /><label for="alt" style="font-size:small;" title="lorsque disponible"> Proposer des liens opendatarchives.fr</label></p></div><div id="docs"></div><div id="results"></div></div>');
+jQuery('h1').after('<div><div><input type="text" id="values" placeholder="bd topo gpkg 2021" style="height:35px" title="Pour exclure un terme, préfixez le avec le signe moins. Ex: -shp" /><a href="javascript:clear()" style="padding: 7px;border: 1px solid #bababa;border-left: none;font-weight: bold;color: #949494;border-radius: 3px;">X</a> <input type="submit" value="rechercher" onclick="javascript:filterFileNames();" style="height:35px" /> <a href="javascript:filterFileNames(true);">liste de liens</a><span style="float:right;"></span><p><input type="checkbox" id="alt" name="alt" /><label for="alt" style="font-size:small;" title="lorsque disponible"> Proposer des liens opendatarchives.fr</label></p></div><div id="results"></div></div>');
 
-const docus = {"admin_express": "ADMIN_EXPRESS", "admin_express_cog": "ADMIN_EXPRESS_COG", "adresse_premium": "ADRESSE_PREMIUM", "bdcarthage": "BDCARTHAGE", "bdcarto": "BDCARTO", "bdcarto_em": "BDCARTO_EM", "bdforet": "BDFORET", "bdpr": "BDPR", "bdtopo": "BDTOPO", "bdtopo_postgresql": "BDTOPO_PostGreSQL", "contours_iris": "CONTOURS_IRIS", "dl_commun": "Vecteur commun", "donnees_geodesiques": "DONNEES_GEODESIQUES", "ebm": "EBM", "egm": "EGM", "erm": "ERM", "geofla": "GEOFLA", "iris_ge": "IRIS_GE", "ocs_ge": "OCS_GE", "route120": "ROUTE120", "route500": "ROUTE500", "rpg": "RPG", "suivi-des-bocages": "SUIVI DES BOCAGES", "dl_commun-1": "Raster commun", "plan-ign": "PLAN IGN", "scan_oaci": "SCAN_OACI", "scan25": "SCAN25", "scan50_histo": "SCAN50_HISTO", "scan100": "SCAN100", "scan500": "SCAN500", "scan1000": "SCAN1000", "scanem10k": "SCANEM10K", "scanem40k": "SCANEM40K", "scanreg": "SCANREG", "applications": "APPLICATIONS", "ressources": "RESSOURCES", "bdaltiv2": "BDALTIV2", "histolitt": "HISTOLITT", "litto3d": "LITTO3D", "ref3dnat": "REF3DNAT", "rge_alti": "RGE_ALTI", "territoire3d": "TERRITOIRE3D", "bdortho_orthohr": "BDORTHO_ORTHOHR", "bdorthohisto": "BDORTHOHISTO", "dl_commun-2": "ORTHO commun", "ortho-sat": "ORTHO-SAT", "bdparcellaire": "BDPARCELLAIRE", "parcellaire_express_pci": "Parcellaire_Express_PCI", "comparatif_vegetation": "COMPARATIF_VEGETATION", "jpeg2000": "JPEG2000", "metadonnees": "METADONNEES", "projets_carto": "PROJETS_CARTO"};
+jQuery('.size').css({"float": "right", "font-variant": "super", "color": "#A0A0A0"});
+jQuery('body').append('<span id="go-up" onclick="uiScrollTo(\'#nav-header\')" style="position: fixed; right: 5px; bottom: 5px; background-color: #fff; border: 1px solid #bababa; border-radius: 4px; width: 35px; height: 35px; text-align: center; cursor: pointer;">^ ^ ^ ^</span>');
 
-var links = '<p>Documentation :</p>';
-for (var d in docus) {
-  links += '<a href="https://geoservices.ign.fr/documentation/diffusion/documentation-offre.html#'+d+'" target="_blank">&#10037; '+docus[d]+'</a>'+"\n";
-}
-$('#docs').html(links);
-$('#docs a').css({"border": "1px solid #bababa", "border-radius": "4px", "font-size": "0.7em", "padding": "2px 5px", "margin": "0 5px 8px 0", "display": "inline-block"});
-$('.size').css({"float": "right", "font-variant": "super", "color": "#A0A0A0"});
-$('body').append('<span id="go-up" onclick="uiScrollTo(\'#nav-header\')" style="position: fixed; right: 5px; bottom: 5px; background-color: #fff; border: 1px solid #bababa; border-radius: 4px; width: 35px; height: 35px; text-align: center; cursor: pointer;">^ ^ ^ ^</span>');
-
-const documentation = $("#docs a");
 const fnameRegex = /([^\/]{1,})$/;
 const altUrl = "https://data.cquest.org/";
-const downloadable = $.merge($("a[href*='7z']"), $("a[href*='zip']"));
+const downloadable = jQuery.merge(jQuery("a[href*='7z']"), jQuery("a[href*='zip']"));
 var opendatarchive = {};
 
-$('#values').focus();
+jQuery('#values').focus();
 
 function filterFileNames(asText = false) {
-  $('#results').html('');
-  var v = $('#values').val().trim().toUpperCase();
+  jQuery('#results').html('');
+  var v = jQuery('#values').val().trim().toUpperCase();
   
   if (v.length > 0) {
-    $('#docs a').css('display', 'none');
-    alt = $('#alt').prop("checked");
+    alt = jQuery('#alt').prop("checked");
     arr = [];
     var text = '';
     v = v.split(' ');
     var results = downloadable;
-    var docs = documentation;
     for (var i in v) {
       if (v[i].startsWith('-')) {
-        results = results.not("a[href*='"+v[i].substring(1)+"']")
-        $("#docs a:contains('"+v[i].substring(1)+"')").css('display', 'none');
+        results = results.not("a[href*='"+v[i].substring(1)+"']");
       }
       else {
         results = results.filter("a[href*='"+v[i]+"']");
-        $("#docs a:contains('"+v[i]+"')").css('display', 'inline-block');
       }
     }
     results.each(function() {
-      arr.push($(this).attr("href"));
+      arr.push(jQuery(this).attr("href"));
     });
 
     if (arr.length > 0) {
@@ -108,30 +95,27 @@ function filterFileNames(asText = false) {
         results_size += ' + '+nosize+' fichiers de taille inconnue';
       }
       
-      $('#results').html('<p>'+arr.length+' '+r+' :<span class="size">'+results_size+'</span></p>'+"\n");
+      jQuery('#results').html('<p>'+arr.length+' '+r+' :<span class="size">'+results_size+'</span></p>'+"\n");
 
       if (asText) {
-        $('#results').append('<textarea style="width:100%;height:200px;">'+text+'</textarea>');
-        $('.size').css({"float": "right", "font-size": "0.8em", "color": "#A0A0A0"});
+        jQuery('#results').append('<textarea style="width:100%;height:200px;">'+text+'</textarea>');
+        jQuery('.size').css({"float": "right", "font-size": "0.8em", "color": "#A0A0A0"});
       }
       else {
-        $('#results').append(text);
-  			$('.size').css({"float": "right", "font-size": "0.8em", "color": "#A0A0A0"});
-  			$('#results a:hover').css({"background-color": "#dfdfdf"});
+        jQuery('#results').append(text);
+  			jQuery('.size').css({"float": "right", "font-size": "0.8em", "color": "#A0A0A0"});
+  			jQuery('#results a:hover').css({"background-color": "#dfdfdf"});
       }
     }
     else {
-      $('#results').html('<p>Aucun résultat</p>');
+      jQuery('#results').html('<p>Aucun résultat</p>');
     }
-  }
-  else {
-    $('#docs a').css('display', 'inline-block');
   }
 }
 
 function clear() {
-  $('#values').val('');
-  $('#values').focus();
+  jQuery('#values').val('');
+  jQuery('#values').focus();
 }
 
 function uiScrollTo(id = '#values') {
@@ -150,13 +134,13 @@ function formatBytes(bytes, decimals = 0) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-$("#values").keypress(function(event) {
+jQuery("#values").keypress(function(event) {
   if (event.keyCode === 13) {
     filterFileNames();
   }
 });
 
-$.getScript( "https://bjperson.github.io/ign-bookmarklet/resources/archives.js" )
+jQuery.getScript( "https://bjperson.github.io/ign-bookmarklet/resources/archives.js" )
   .done(function() {
     opendatarchive = {};
     archives.sort((a, b) => {
