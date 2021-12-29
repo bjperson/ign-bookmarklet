@@ -8429,6 +8429,7 @@ archives = [{"name":"BDFORET_2-0__SHP_LAMB93_D001_2014-04-01.7z","time":"2021-04
 {"name":"COURBE_1-0_SHP_RGAF09UTM20_D978-2021-01-01.7z","time":"2021-07-20T14:05","size":1249324,"path":"ign/bdalti/"},
 {"name":"COURBE_1-0_SHP_RGM04UTM38S_D976-2021-01-01.7z","time":"2021-07-20T13:44","size":6686006,"path":"ign/bdalti/"},
 {"name":"COURBE_1-0_SHP_RGR92UTM40S_D974-2021-01-01.7z","time":"2021-07-20T13:55","size":84921195,"path":"ign/bdalti/"},
+{"name":"MASQUE-SOURCE-BDALTIV2_2-0_MIXTE_WLD_2021-12-09.7z","time":"2021-12-10T13:41","size":122583473,"path":"ign/bdalti/"},
 {"name":"BDTOPO_3-0_HYDROGRAPHIE_SHP_LAMB93_FXX_2019-09-19.7z","time":"2019-12-20T15:11","size":718659342,"path":"ign/bdtopo-hydro/"},
 {"name":"BDTOPO_3-0_HYDROGRAPHIE_SHP_LAMB93_FXX_2019-12-16.7z","time":"2020-03-01T09:46","size":719455603,"path":"ign/bdtopo-hydro/"},
 {"name":"BDTOPO_3-0_HYDROGRAPHIE_SHP_LAMB93_FXX_2020-06-15.7z","time":"2020-07-07T06:06","size":726556440,"path":"ign/bdtopo-hydro/"},
