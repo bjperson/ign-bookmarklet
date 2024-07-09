@@ -17876,6 +17876,8 @@ archives = [{"name":"BDTOPO_3-0_ERP_SHP_LAMB93_FXX_2019-09-19.7z","time":"2019-1
 {"name":"DNSB-HAIES_1-0__SHP_L93_D093_2020-06-24.7z","time":"2021-07-24T21:51","size":18115,"path":"ign/bdhaies/"},
 {"name":"DNSB-HAIES_1-0__SHP_L93_D094_2020-06-24.7z","time":"2021-07-24T21:51","size":48211,"path":"ign/bdhaies/"},
 {"name":"DNSB-HAIES_1-0__SHP_L93_D095_2020-06-24.7z","time":"2021-07-24T21:51","size":993805,"path":"ign/bdhaies/"},
+{"name":"HAIE_1-0__GPKG_LAMB93_FXX_2023-12-15.7z","time":"2024-07-08T18:12","size":1452534489,"path":"ign/bdhaies/"},
+{"name":"HAIE_2-0__GPKG_LAMB93_FXX_2024-03-15.7z","time":"2024-07-08T19:41","size":1509957929,"path":"ign/bdhaies/"},
 {"name":"BDALTIV2-75M_ASC_LAMB93_FXX_2013-10-01.7z","time":"2021-05-14T07:11","size":189955285,"path":"ign/bdalti/"},
 {"name":"BDALTIV2_2-0_250M_ASC_LAMB93-IGN69_FRANCE_2018-01-15.7z","time":"2018-01-23T15:14","size":21985678,"path":"ign/bdalti/"},
 {"name":"BDALTIV2_2-0_25M_ASC_LAMB93-IGN69_D001_2020-02-25.7z","time":"2021-02-27T06:51","size":32010633,"path":"ign/bdalti/"},
