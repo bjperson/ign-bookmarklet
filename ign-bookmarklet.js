@@ -1,156 +1,296 @@
-jQuery('h1').after('<div><div><input type="text" id="values" placeholder="bd topo gpkg 2021" style="height:35px" title="Pour exclure un terme, préfixez le avec le signe moins. Ex: -shp" /><a href="javascript:clear()" style="padding: 7px;border: 1px solid #bababa;border-left: none;font-weight: bold;color: #949494;border-radius: 3px;">X</a> <input type="submit" value="rechercher" onclick="javascript:filterFileNames();" style="height:35px" /> <a href="javascript:filterFileNames(true);">liste de liens</a><span style="float:right;"></span><p><input type="checkbox" id="alt" name="alt" /><label for="alt" style="font-size:small;" title="lorsque disponible"> Proposer des liens opendatarchives.fr</label></p></div><div id="results"></div></div>');
+(function() {
+  'use strict';
 
-jQuery('.size').css({"float": "right", "font-variant": "super", "color": "#A0A0A0"});
-jQuery('body').append('<span id="go-up" onclick="uiScrollTo(\'#nav-header\')" style="position: fixed; right: 5px; bottom: 5px; background-color: #fff; border: 1px solid #bababa; border-radius: 4px; width: 35px; height: 35px; text-align: center; cursor: pointer;">^ ^ ^ ^</span>');
+  if (document.getElementById('ign-bm')) return;
 
-const fnameRegex = /([^\/]{1,})$/;
-const altUrl = "https://data.cquest.org/";
-const downloadable = jQuery.merge(jQuery("a[href*='7z']"), jQuery("a[href*='zip']"));
-var opendatarchive = {};
+  var GEOPF_BASE = 'https://data.geopf.fr/telechargement/download/';
+  var ALT_BASE = 'https://data.cquest.org/';
+  var ARCHIVES_URL = 'https://bjperson.github.io/ign-bookmarklet/resources/archives.js';
 
-jQuery('#values').focus();
+  var PAGE_SIZE = 20;
+  var archiveEntries = [];
+  var datasetHint = '';
+  var lastMatches = [];
+  var currentPage = 0;
 
-function filterFileNames(asText = false) {
-  jQuery('#results').html('');
-  var v = jQuery('#values').val().trim().toUpperCase();
-  
-  if (v.length > 0) {
-    alt = jQuery('#alt').prop("checked");
-    arr = [];
-    var text = '';
-    v = v.split(' ');
-    var results = downloadable;
-    for (var i in v) {
-      if (v[i].startsWith('-')) {
-        results = results.not("a[href*='"+v[i].substring(1)+"']");
-      }
-      else {
-        results = results.filter("a[href*='"+v[i]+"']");
-      }
+  function getDatasetHint() {
+    var m = window.location.pathname.match(/\/dataset\/(?:IGNF_)?(.+)$/);
+    if (!m) return '';
+    return m[1].replace(/-/g, ' ');
+  }
+
+  function extractDatasetId(name) {
+    var m = name.match(/^(.+?)_\d+-\d+/);
+    return m ? m[1] : name.split('_')[0];
+  }
+
+  function buildDownloadUrl(name) {
+    var datasetId = extractDatasetId(name);
+    var entryName = name.replace(/\.(7z|zip)(\.\d+)?$/i, '');
+    return GEOPF_BASE + datasetId + '/' + entryName + '/' + name;
+  }
+
+  function buildAltUrl(entry) {
+    return ALT_BASE + entry.path + entry.name;
+  }
+
+  function formatBytes(bytes, decimals) {
+    if (!bytes) return '0 b';
+    var k = 1024;
+    var dm = decimals > 0 ? decimals : 0;
+    var sizes = ['b', 'Ko', 'Mo', 'Go', 'To'];
+    var i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
+
+  function buildSummary(matches) {
+    var totalSize = 0;
+    var unknownCount = 0;
+    for (var i = 0; i < matches.length; i++) {
+      if (matches[i].size) totalSize += matches[i].size;
+      else unknownCount++;
     }
-    results.each(function() {
-      arr.push(jQuery(this).attr("href"));
+    var summary = matches.length + ' résultat' + (matches.length > 1 ? 's' : '');
+    if (totalSize > 0) summary += ' — ' + formatBytes(totalSize, 2);
+    if (unknownCount > 0) summary += ' + ' + unknownCount + ' de taille inconnue';
+    return summary;
+  }
+
+  function renderPage() {
+    var listDiv = document.getElementById('ign-bm-list');
+    if (!listDiv) return;
+    listDiv.innerHTML = '';
+
+    var useAlt = document.getElementById('ign-bm-alt').checked;
+    var paginate = document.getElementById('ign-bm-paginate').checked;
+    var start = paginate ? currentPage * PAGE_SIZE : 0;
+    var end = paginate ? Math.min(start + PAGE_SIZE, lastMatches.length) : lastMatches.length;
+
+    for (var i = start; i < end; i++) {
+      var entry = lastMatches[i];
+      var url = useAlt ? buildAltUrl(entry) : buildDownloadUrl(entry.name);
+      var sizeStr = entry.size ? formatBytes(entry.size) : '...';
+      listDiv.insertAdjacentHTML('beforeend',
+        '<a href="' + url + '" style="display:block;padding:2px 4px;text-decoration:none;color:#000;">' +
+        entry.name +
+        '<span style="float:right;font-size:0.8em;color:#666;">' + sizeStr + '</span></a>\n');
+    }
+
+    var nav = document.getElementById('ign-bm-nav');
+    if (!nav) return;
+    var totalPages = Math.ceil(lastMatches.length / PAGE_SIZE);
+    if (!paginate || totalPages <= 1) { nav.innerHTML = ''; return; }
+    nav.innerHTML = '';
+
+    var prev = document.createElement('a');
+    prev.href = '#';
+    prev.textContent = '< précédent';
+    prev.style.cssText = 'margin-right:10px;' + (currentPage === 0 ? 'color:#ccc;pointer-events:none;' : '');
+    prev.addEventListener('click', function(e) { e.preventDefault(); if (currentPage > 0) { currentPage--; renderPage(); listDiv.scrollIntoView({behavior: 'smooth'}); } });
+
+    var info = document.createElement('span');
+    info.textContent = 'page ' + (currentPage + 1) + '/' + totalPages;
+    info.style.cssText = 'margin:0 10px;';
+
+    var next = document.createElement('a');
+    next.href = '#';
+    next.textContent = 'suivant >';
+    next.style.cssText = 'margin-left:10px;' + (currentPage >= totalPages - 1 ? 'color:#ccc;pointer-events:none;' : '');
+    next.addEventListener('click', function(e) { e.preventDefault(); if (currentPage < totalPages - 1) { currentPage++; renderPage(); listDiv.scrollIntoView({behavior: 'smooth'}); } });
+
+    nav.appendChild(prev);
+    nav.appendChild(info);
+    nav.appendChild(next);
+  }
+
+  function filterFileNames(asText) {
+    var resultsDiv = document.getElementById('ign-bm-results');
+    resultsDiv.innerHTML = '';
+    var query = document.getElementById('ign-bm-input').value.trim().toUpperCase();
+    var fullQuery = datasetHint ? datasetHint.toUpperCase() + (query ? ' ' + query : '') : query;
+    if (!fullQuery) return;
+
+    var terms = fullQuery.split(/\s+/);
+
+    lastMatches = archiveEntries.filter(function(entry) {
+      var name = entry.name.toUpperCase();
+      return terms.every(function(term) {
+        if (term.startsWith('-') && term.length > 1) {
+          return name.indexOf(term.substring(1)) === -1;
+        }
+        return name.indexOf(term) !== -1;
+      });
     });
 
-    if (arr.length > 0) {
-      var r = 'résultats';
-      if (arr.length === 1) {
-        r = 'résultat';
-      }
-
-      var size = 0;
-      var nosize = 0;
-
-      for (var i in arr.sort()) {
-        var fname = arr[i].match(fnameRegex)[1];
-        var fnameOA = false;
-
-        if (fname in opendatarchive) {
-          fnameOA = fname;
-        }
-        /* More checks needed to do this :
-        else if (fname.replace('.001', '') in opendatarchive) {
-          fnameOA = fname.replace('.001', '');
-        }
-        else if (fname+'.001' in opendatarchive) {
-          fnameOA = fname+'.001';
-        }
-        */
-
-        if (fnameOA === false) {
-          nosize += 1;
-        }
-        else {
-          size += opendatarchive[fnameOA].size;
-        }
-
-        if (asText) {
-          if (alt === true && fnameOA !== false) {
-            text += altUrl+opendatarchive[fnameOA].path+fname+"\n";
-          }
-          else {
-            text += arr[i]+"\n";
-          }
-        }
-        else {
-          if (alt === true && fnameOA !== false) {
-            text += '<a href="'+altUrl+opendatarchive[fnameOA].path+fnameOA+'">'+fname+'<span  class="size">'+formatBytes(opendatarchive[fnameOA].size)+'</span></a><br />'+"\n";
-          }
-          else if (fnameOA !== false) {
-            text += '<a href="'+arr[i]+'">'+fname+'<span class="size">'+formatBytes(opendatarchive[fnameOA].size)+'</span></a><br />'+"\n";
-          }
-          else {
-            text += '<a href="'+arr[i]+'">'+fname+'<span class="size" title="taille inconnue">...</span></a><br />'+"\n";
-          }
-        }
-      }
-      
-      var results_size = '';
-      
-      if (size !== 0) {
-        results_size += formatBytes(size, 2);
-      }
-      
-      if (nosize !== 0) {
-        results_size += ' + '+nosize+' fichiers de taille inconnue';
-      }
-      
-      jQuery('#results').html('<p>'+arr.length+' '+r+' :<span class="size">'+results_size+'</span></p>'+"\n");
-
-      if (asText) {
-        jQuery('#results').append('<textarea style="width:100%;height:200px;">'+text+'</textarea>');
-        jQuery('.size').css({"float": "right", "font-size": "0.8em", "color": "#A0A0A0"});
-      }
-      else {
-        jQuery('#results').append(text);
-  			jQuery('.size').css({"float": "right", "font-size": "0.8em", "color": "#A0A0A0"});
-  			jQuery('#results a:hover').css({"background-color": "#dfdfdf"});
-      }
+    if (lastMatches.length === 0) {
+      resultsDiv.innerHTML = '<p>Aucun résultat</p>';
+      return;
     }
-    else {
-      jQuery('#results').html('<p>Aucun résultat</p>');
+
+    lastMatches.sort(function(a, b) { return a.name.localeCompare(b.name); });
+
+    resultsDiv.innerHTML = '<p style="font-weight:bold;margin:8px 0;">' + buildSummary(lastMatches) + '</p>';
+
+    if (asText) {
+      var useAlt = document.getElementById('ign-bm-alt').checked;
+      var text = '';
+      for (var i = 0; i < lastMatches.length; i++) {
+        var entry = lastMatches[i];
+        text += (useAlt ? buildAltUrl(entry) : buildDownloadUrl(entry.name)) + '\n';
+      }
+      var textarea = document.createElement('textarea');
+      textarea.style.cssText = 'width:100%;height:200px;font-family:monospace;font-size:12px;';
+      textarea.value = text;
+      resultsDiv.appendChild(textarea);
+
+      var copyBtn = document.createElement('button');
+      copyBtn.textContent = 'copier';
+      copyBtn.style.cssText = 'margin-top:4px;padding:4px 12px;background:#000091;color:#fff;border:none;cursor:pointer;';
+      copyBtn.addEventListener('click', function() {
+        navigator.clipboard.writeText(text).then(function() {
+          copyBtn.textContent = 'copié !';
+          setTimeout(function() { copyBtn.textContent = 'copier'; }, 2000);
+        });
+      });
+      resultsDiv.appendChild(copyBtn);
+    } else {
+      var listDiv = document.createElement('div');
+      listDiv.id = 'ign-bm-list';
+      resultsDiv.appendChild(listDiv);
+
+      var nav = document.createElement('div');
+      nav.id = 'ign-bm-nav';
+      nav.style.cssText = 'text-align:center;padding:8px 0;';
+      resultsDiv.appendChild(nav);
+
+      currentPage = 0;
+      renderPage();
     }
   }
-}
 
-function clear() {
-  jQuery('#values').val('');
-  jQuery('#values').focus();
-}
+  function createUI() {
+    datasetHint = getDatasetHint();
 
-function uiScrollTo(id = '#values') {
-  document.querySelector(id).scrollIntoView({
-    behavior: 'smooth'
-  });
-}
+    var container = document.createElement('div');
+    container.id = 'ign-bm';
+    container.style.cssText = 'background:#f6f6f6;border-bottom:3px solid #000091;padding:15px 20px;font-family:Arial,sans-serif;';
 
-// from: https://stackoverflow.com/a/18650828
-function formatBytes(bytes, decimals = 0) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['b', 'Ko', 'Mo', 'Go', 'To', 'Po', 'Eo', 'Zo', 'Yo'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-}
+    var bar = document.createElement('div');
+    bar.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;';
 
-jQuery("#values").keypress(function(event) {
-  if (event.keyCode === 13) {
-    filterFileNames();
-  }
-});
-
-jQuery.getScript( "https://bjperson.github.io/ign-bookmarklet/resources/archives.js" )
-  .done(function() {
-    opendatarchive = {};
-    archives.sort((a, b) => {
-      if (Date.parse(a.time) > Date.parse(b.time)) return -1
-        return Date.parse(a.time) < Date.parse(b.time) ? 1 : 0
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.id = 'ign-bm-input';
+    input.value = '';
+    input.placeholder = datasetHint ? 'gpkg 2024 D001' : 'bd topo gpkg 2024';
+    input.title = 'Pour exclure un terme, préfixez le avec le signe moins. Ex: -shp';
+    input.style.cssText = 'flex:1;min-width:200px;height:35px;padding:4px 8px;border:1px solid #bababa;font-size:14px;';
+    input.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') filterFileNames(false);
     });
-    for (var i in archives) {
-      if (!(archives[i].name in opendatarchive)) {
-        opendatarchive[archives[i].name] = archives[i];
-      }
+
+    var clearBtn = document.createElement('button');
+    clearBtn.textContent = 'X';
+    clearBtn.style.cssText = 'height:35px;padding:0 10px;border:1px solid #bababa;background:#fff;cursor:pointer;font-weight:bold;color:#949494;';
+    clearBtn.addEventListener('click', function() {
+      input.value = '';
+      input.focus();
+    });
+
+    var searchBtn = document.createElement('button');
+    searchBtn.textContent = 'rechercher';
+    searchBtn.id = 'ign-bm-search';
+    searchBtn.style.cssText = 'height:35px;padding:0 15px;background:#000091;color:#fff;border:none;cursor:pointer;';
+    searchBtn.addEventListener('click', function() { filterFileNames(false); });
+
+    var listLink = document.createElement('a');
+    listLink.href = '#';
+    listLink.textContent = 'liste de liens';
+    listLink.style.cssText = 'font-size:13px;';
+    listLink.addEventListener('click', function(e) { e.preventDefault(); filterFileNames(true); });
+
+    bar.appendChild(input);
+    bar.appendChild(clearBtn);
+    bar.appendChild(searchBtn);
+    bar.appendChild(listLink);
+
+    var options = document.createElement('div');
+    options.style.cssText = 'margin-top:4px;';
+
+    var altCheckbox = document.createElement('input');
+    altCheckbox.type = 'checkbox';
+    altCheckbox.id = 'ign-bm-alt';
+    var altLabel = document.createElement('label');
+    altLabel.style.cssText = 'font-size:small;';
+    altLabel.appendChild(altCheckbox);
+    altLabel.appendChild(document.createTextNode(' Proposer des liens opendatarchives.fr'));
+
+    var status = document.createElement('span');
+    status.id = 'ign-bm-status';
+    status.style.cssText = 'font-size:small;color:#666;margin-left:10px;';
+    status.textContent = 'Chargement des archives...';
+
+    var paginateCheckbox = document.createElement('input');
+    paginateCheckbox.type = 'checkbox';
+    paginateCheckbox.id = 'ign-bm-paginate';
+    paginateCheckbox.checked = true;
+    var paginateLabel = document.createElement('label');
+    paginateLabel.style.cssText = 'font-size:small;margin-left:15px;';
+    paginateLabel.appendChild(paginateCheckbox);
+    paginateLabel.appendChild(document.createTextNode(' Paginer les résultats'));
+
+    options.appendChild(altLabel);
+    options.appendChild(paginateLabel);
+    options.appendChild(status);
+
+    var results = document.createElement('div');
+    results.id = 'ign-bm-results';
+    results.style.cssText = 'margin-top:8px;';
+
+    container.appendChild(bar);
+    container.appendChild(options);
+    container.appendChild(results);
+
+    var header = document.querySelector('header');
+    if (header && header.nextSibling) {
+      header.parentNode.insertBefore(container, header.nextSibling);
+    } else if (header) {
+      header.parentNode.appendChild(container);
+    } else {
+      document.body.prepend(container);
     }
-    archives = {};
-  });
+    input.focus();
+  }
+
+  function loadArchives() {
+    var script = document.createElement('script');
+    script.src = ARCHIVES_URL;
+    script.onload = function() {
+      if (typeof archives !== 'undefined') {
+        archives.sort(function(a, b) { return Date.parse(b.time) - Date.parse(a.time); });
+        var seen = {};
+        for (var i = 0; i < archives.length; i++) {
+          if (!(archives[i].name in seen)) {
+            seen[archives[i].name] = archives[i];
+          }
+        }
+        archiveEntries = Object.values(seen).filter(function(e) {
+          return /\.(7z|zip)(\.[\d]+)?$/i.test(e.name);
+        });
+        archives = null;
+        document.getElementById('ign-bm-status').textContent = archiveEntries.length + ' fichiers indexés';
+
+        if (datasetHint || document.getElementById('ign-bm-input').value) {
+          filterFileNames(false);
+        }
+      }
+    };
+    script.onerror = function() {
+      document.getElementById('ign-bm-status').textContent = 'Erreur de chargement des archives';
+    };
+    document.body.appendChild(script);
+  }
+
+  createUI();
+  loadArchives();
+})();
