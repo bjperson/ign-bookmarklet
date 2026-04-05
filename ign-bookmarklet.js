@@ -19,15 +19,52 @@
     return m[1].replace(/-/g, ' ');
   }
 
-  function extractDatasetId(name) {
-    var m = name.match(/^(.+?)_\d+-\d+/);
-    return m ? m[1] : name.split('_')[0];
+  // Mapping: filename prefix from archives.js → geopf resource ID
+  var GEOPF_RESOURCES = {
+    'ADMIN-EXPRESS': 'ADMIN-EXPRESS',
+    'ADMIN-EXPRESS-COG-CARTO-PE': 'ADMIN-EXPRESS-COG-CARTO-PE',
+    'ADMIN-EXPRESS-COG-CARTOPLUS': 'ADMIN-EXPRESS-COG-CARTOPLUS',
+    'ADMIN-EXPRESS-COG-CARTO': 'ADMIN-EXPRESS-COG-CARTO',
+    'ADMIN-EXPRESS-COG': 'ADMIN-EXPRESS-COG',
+    'BAN-PLUS': 'BAN-PLUS',
+    'BDALTIV2': 'BDALTI',
+    'BDCARTO': 'BDCARTO',
+    'BDFORET': 'BDFORET',
+    'BDORTHO': 'BDORTHO',
+    'BDPARCELLAIRE': 'BDPARCELLAIRE',
+    'BDTOPO-DIFF': 'BDTOPO-DIFF',
+    'BDTOPO': 'BDTOPO',
+    'CONTOURS-IRIS': 'CONTOURS-IRIS',
+    'GEODESIE': 'GEODESIE',
+    'GEOFLA': 'GEOFLA',
+    'IRIS-GE': 'IRIS-GE',
+    'MNS-Correl': 'MNS-CORREL',
+    'RGEALTI': 'RGEALTI',
+    'ROUTE500': 'ROUTE500',
+    'RPG': 'RPG',
+    'SCAN1000': 'SCAN1000',
+    'SCAN500': 'SCAN500',
+    'SCAN50': 'SCAN50',
+    'SCANEM10K': 'SCANEM10K',
+    'SCANEM40K': 'SCANEM40K',
+    'SCANREG': 'SCANREG'
+  };
+
+  function getGeopfResourceId(name) {
+    var keys = Object.keys(GEOPF_RESOURCES).sort(function(a, b) { return b.length - a.length; });
+    for (var i = 0; i < keys.length; i++) {
+      if (name.toUpperCase().indexOf(keys[i].toUpperCase()) === 0) {
+        return GEOPF_RESOURCES[keys[i]];
+      }
+    }
+    return null;
   }
 
-  function buildDownloadUrl(name) {
-    var datasetId = extractDatasetId(name);
-    var entryName = name.replace(/\.(7z|zip)(\.\d+)?$/i, '');
-    return GEOPF_BASE + datasetId + '/' + entryName + '/' + name;
+  function buildDownloadUrl(entry) {
+    var resourceId = getGeopfResourceId(entry.name);
+    if (!resourceId) return ALT_BASE + entry.path + entry.name;
+    var entryName = entry.name.replace(/\.(7z|zip)(\.\d+)?$/i, '');
+    return GEOPF_BASE + resourceId + '/' + entryName + '/' + entry.name;
   }
 
   function buildAltUrl(entry) {
@@ -68,12 +105,16 @@
 
     for (var i = start; i < end; i++) {
       var entry = lastMatches[i];
-      var url = useAlt ? buildAltUrl(entry) : buildDownloadUrl(entry.name);
+      var mainUrl = buildDownloadUrl(entry);
+      var altUrl = buildAltUrl(entry);
+      var url = useAlt ? altUrl : mainUrl;
+      var fallback = (url === mainUrl && mainUrl !== altUrl) ?
+        ' <a href="' + altUrl + '" style="font-size:0.75em;color:#999;" title="lien alternatif opendatarchives.fr">[alt]</a>' : '';
       var sizeStr = entry.size ? formatBytes(entry.size) : '...';
       listDiv.insertAdjacentHTML('beforeend',
-        '<a href="' + url + '" style="display:block;padding:2px 4px;text-decoration:none;color:#000;">' +
-        entry.name +
-        '<span style="float:right;font-size:0.8em;color:#666;">' + sizeStr + '</span></a>\n');
+        '<a href="' + url + '" style="display:inline;padding:2px 4px;text-decoration:none;color:#000;">' +
+        entry.name + '</a>' + fallback +
+        '<span style="float:right;font-size:0.8em;color:#666;">' + sizeStr + '</span><br>\n');
     }
 
     var nav = document.getElementById('ign-bm-nav');
@@ -136,7 +177,7 @@
       var text = '';
       for (var i = 0; i < lastMatches.length; i++) {
         var entry = lastMatches[i];
-        text += (useAlt ? buildAltUrl(entry) : buildDownloadUrl(entry.name)) + '\n';
+        text += (useAlt ? buildAltUrl(entry) : buildDownloadUrl(entry)) + '\n';
       }
       var textarea = document.createElement('textarea');
       textarea.style.cssText = 'width:100%;height:200px;font-family:monospace;font-size:12px;';
@@ -166,6 +207,9 @@
       currentPage = 0;
       renderPage();
     }
+
+    resultsDiv.insertAdjacentHTML('beforeend',
+      '<p style="font-size:0.8em;color:#666;margin:8px 0 0;">Certains fichiers anciens ne sont disponibles que sur <a href="https://data.cquest.org/ign/" style="color:#666;">opendatarchives.fr</a> [alt]</p>');
   }
 
   function createUI() {
@@ -173,7 +217,8 @@
 
     var container = document.createElement('div');
     container.id = 'ign-bm';
-    container.style.cssText = 'background:#f6f6f6;border-bottom:3px solid #000091;padding:15px 20px;font-family:Arial,sans-serif;';
+    container.className = 'container-lg';
+    container.style.cssText = 'margin:0 auto;padding:15px 16px;font-family:Arial,sans-serif;';
 
     var bar = document.createElement('div');
     bar.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;';
@@ -251,11 +296,11 @@
     container.appendChild(options);
     container.appendChild(results);
 
-    var header = document.querySelector('header');
-    if (header && header.nextSibling) {
-      header.parentNode.insertBefore(container, header.nextSibling);
-    } else if (header) {
-      header.parentNode.appendChild(container);
+    var anchor = document.querySelector('datahub-header-record') || document.querySelector('header');
+    if (anchor && anchor.nextSibling) {
+      anchor.parentNode.insertBefore(container, anchor.nextSibling);
+    } else if (anchor) {
+      anchor.parentNode.appendChild(container);
     } else {
       document.body.prepend(container);
     }

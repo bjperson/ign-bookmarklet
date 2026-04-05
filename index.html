@@ -1,37 +1,91 @@
 <html>
+<head>
 <title>IGN Bookmarklet</title>
 <style>
   body {
-      font-family: Arial;
-      font-style: italic;
-      margin: auto;
-      padding-top: 3%;
-      text-align: center;
+    font-family: Arial, sans-serif;
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 0 20px;
+    color: #333;
+    line-height: 1.6;
+  }
+  h1 {
+    color: #2d5f2d;
+    border-bottom: 2px solid #2d5f2d;
+    padding-bottom: 8px;
   }
   #bookmarklet {
-    font-size: 4em;
+    display: inline-block;
+    font-size: 2em;
+    padding: 15px 30px;
+    background: #3a7a3a;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    margin: 15px 0;
+  }
+  #bookmarklet:hover { background: #2d5f2d; }
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+  .examples {
+    text-align: left;
+    background: #f6f6f6;
+    padding: 12px 20px;
+    border-radius: 4px;
+    margin: 10px 0;
+  }
+  .examples li { margin: 4px 0; }
+  .install { text-align: center; }
+  footer {
+    margin-top: 30px;
+    font-size: 0.85em;
+    color: #666;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
   }
 </style>
+</head>
 <body>
-  <h1>Installation</h1>
 
-  <p>Il suffit de glisser/déposer le lien ci-dessous dans vos marques pages  :</p>
+  <h1>IGN Bookmarklet</h1>
 
-  <p style="text-align:center"><a id="bookmarklet" href="">IGN Bookmarklet</a></p>
+  <p>Moteur de recherche pour les jeux de données IGN sur <a href="https://cartes.gouv.fr/rechercher-une-donnee/">cartes.gouv.fr</a>.</p>
+  <p>Permet de filtrer et télécharger les fichiers disponibles sur la Géoplateforme et sur le miroir <a href="https://data.cquest.org/ign/">opendatarchives.fr</a>.</p>
 
-  <p>Ceci devrait créer un nouveau marque page intitulé "IGN Bookmarklet".</p>
+  <h2>Installation</h2>
 
-  <h1>Utilisation</h1>
+  <p>Glisser/déposer le lien ci-dessous dans votre barre de favoris :</p>
 
-  <p>Aller sur la page d'un jeu de données (par exemple : <a href="https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_BD-TOPO">BD TOPO</a>)</p>
+  <p class="install"><a id="bookmarklet" href="">IGN Bookmarklet</a></p>
 
-  <p>Cliquer sur le marque page</p>
+  <h2>Utilisation</h2>
 
-  <p>Le moteur de recherche doit apparaître en haut de page.<p>
+  <ol>
+    <li>Aller sur la page d'un jeu de données, par exemple : <a href="https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_BD-TOPO">BD TOPO</a>, <a href="https://cartes.gouv.fr/rechercher-une-donnee/dataset/IGNF_ADMIN-EXPRESS">ADMIN EXPRESS</a></li>
+    <li>Cliquer sur le marque-page</li>
+    <li>Le moteur de recherche apparaît sous l'en-tête de la page</li>
+  </ol>
 
-  <p>Pour exclure un terme, préfixez le avec le signe moins. Ex: <code>bd topo gpkg -shp</code></p>
+  <h2>Recherche</h2>
 
-  <p><a href="https://fr.wikipedia.org/wiki/Bookmarklet">Définition d'un bookmarklet sur Wikipédia</a></p>
+  <p>Tapez des mots-clés séparés par des espaces. Le nom du jeu de données est ajouté automatiquement.</p>
+
+  <div class="examples">
+    <ul>
+      <li><code>gpkg 2025 D069</code> - GeoPackage, Rhône, édition 2025</li>
+      <li><code>shp lamb93 FRA</code> - Shapefile Lambert-93, France entière</li>
+      <li><code>gpkg -shp -sql</code> - GeoPackage uniquement (exclut SHP et SQL)</li>
+    </ul>
+  </div>
+
+  <footer>
+    <a href="https://github.com/bjperson/ign-bookmarklet">Code source</a> -
+    <a href="https://fr.wikipedia.org/wiki/Bookmarklet">Qu'est-ce qu'un bookmarklet ?</a>
+  </footer>
 
 </body>
 <script>
